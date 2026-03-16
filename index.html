@@ -99,136 +99,184 @@
 <div class="input-area"><div class="input-wrapper">
     <textarea id="chatInput" rows="1" placeholder="Ask about Ufuk's experience, skills, projects..." onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-</div><div class="input-hint" id="modeIndicator">✨ Free & open-source · No API key needed</div></div>
+</div><div class="input-hint" id="modeIndicator">✨ RAG-powered · Retrieval-Augmented Generation</div></div>
 <script>
-const CV_TEXT=`UFUK YILMAZ - Senior Data Scientist at GTECH, Istanbul (April 2021-Present)
-Born: 13/02/1996 | Email: ylmzz.ufuk@gmail.com | Phone: (+90) 5054410838
+// ═══════════════════════════════════════
+// KNOWLEDGE BASE — 13 semantic CV chunks
+// ═══════════════════════════════════════
+const KB=[
+  {id:'personal',title:'Personal & Contact',content:`Ufuk Yılmaz — Senior Data Scientist, Istanbul, Turkey. Born: 13 Feb 1996.
+Email: ylmzz.ufuk@gmail.com | Phone: (+90) 5054410838
 GitHub: https://github.com/ufukyllmaz | StackOverflow: https://stackoverflow.com/users/16680369
-EDUCATION: Mathematics BSc - Middle East Technical University (METU/ODTU), Ankara, 2021
-WORK:
-1. GTECH (Apr 2021-Present) Senior Data Scientist
-Airlines: Pegasus Airlines in-flight sales prediction (7% profit increase, 20% waste reduction, contributed to Turkey's 50 most innovative companies). Turkish Airlines customer segmentation K-Means.
-Retail: Beymen shift optimization & sales prediction (3rd place RDCONF Turkey 2024). Azure Marketplace demand forecasting PySpark.
-Banking: Kapital Bank Azerbaijan income estimation DataIKU. KuveytTurk & Vakif Bank survival analysis (Cox PH, Kaplan-Meier, XGBSE) for deposit early redemption & prepayment risk. GarantiBBVA SAS-to-SQL migration IFRS9 credit risk.
-R&D: HR AI Chatbot RAG architecture LLama ChatGPT APIs for 300-employee org. SafeRoute-6G road safety fuel consumption. Text-to-SQL LangChain LlamaIndex. Big data pipelines Cloudera HDFS Hive Impala Druid Superset.
-Training: DashenBank Ethiopia on-site data science curriculum for 8 professionals.
-2. Papilon Savunma Research Assistant (Nov 2020-Mar 2021): YOLOv3 real-time plate detection DarkNet-53 web scraping data labeling.
-3. Papilon Savunma Software Developer Intern (Jul-Sep 2020)
-PROJECTS: Dogus Otomotiv Kaggle competition 2nd place overall (LightGBM CatBoost XGBoost). OCR system hand-written notes PyTesseract OpenCV. Web scraping volleyball players Selenium BeautifulSoup.
-SKILLS: Python SQL Spark PySpark Scikit-learn Keras TensorFlow LLM LangChain Linux Hadoop Hive SAS XGBoost LightGBM CatBoost OpenCV Azure DataIKU
-CERTS: Azure Data Scientist Associate Microsoft 2024-2025 (https://learn.microsoft.com/api/credentials/share/en-gb/ufukyilmaz/B94692A4FE34A7EC). SAS Programming Coursera 2022.
-CONFERENCES: Big Data Academy GTECH 2021 (Hadoop Kafka Cassandra MongoDB Striim). Quantum Programming QTURKEY 2020. Cryptography Summer School 2019.
-LANGUAGES: Turkish native, English. HOBBIES: Tennis.`;
+Languages: Turkish (native), English (proficient). Hobby: Tennis.`,tags:['contact','email','phone','github','stackoverflow','personal','hobby','tennis','language','born','iletisim','dil','hobi','tenis','ulasim']},
+  {id:'education',title:'Education, Certifications & Conferences',content:`Degree: Mathematics BSc — Middle East Technical University (METU / ODTÜ), Ankara. Graduated 2021.
+Certifications:
+- Azure Data Scientist Associate (Microsoft, 2024–2025): https://learn.microsoft.com/api/credentials/share/en-gb/ufukyilmaz/B94692A4FE34A7EC?sharingId=17324A185EA8A07E
+- SAS Programming (Coursera, 2022): https://coursera.org/share/fd5f6a0676d5327b959813f653949426
+Conferences:
+- Big Data Academy (GTECH, 2021) — Hadoop, Kafka, Cassandra, MongoDB, Striim
+- Quantum Programming (QTURKEY, 2020)
+- Cryptography Summer School (2019)`,tags:['education','university','metu','odtu','mathematics','degree','graduation','certificate','certifications','azure','sas','coursera','conference','egitim','universite','sertifika','mezun','diploma','akademik']},
+  {id:'skills',title:'Technical Skills',content:`Programming: Python, SQL, SAS
+Machine Learning / Deep Learning: Scikit-learn, XGBoost, LightGBM, CatBoost, Keras, TensorFlow
+Big Data: Spark, PySpark, Hadoop, Hive, HDFS, Impala, Druid, Kafka, Cassandra, MongoDB
+AI / LLM: LangChain, LlamaIndex, RAG, Text-to-SQL (NL2SQL), LLM APIs
+Computer Vision: OpenCV, YOLOv3, DarkNet-53, PyTesseract
+Cloud & Platforms: Microsoft Azure, DataIKU, Cloudera, Linux
+Visualization: Apache Superset
+Statistical Modeling: Cox PH, Kaplan-Meier, XGBSE, K-Means Clustering`,tags:['skill','python','sql','spark','pyspark','hadoop','machine learning','deep learning','tensorflow','keras','azure','langchain','opencv','technology','tool','programming','beceri','teknoloji','yetenek','ara']},
+  {id:'gtech',title:'GTECH — Senior Data Scientist (April 2021 – Present)',content:`Current employer: GTECH, Istanbul, Turkey. Role: Senior Data Scientist. Started April 2021 (4+ years).
+Project domains: Airlines, Retail, Banking, R&D, International Training.
+GTECH was named among Turkey's 50 Most Innovative Companies, partly due to Ufuk's Pegasus Airlines work.`,tags:['gtech','company','employer','work','career','experience','istanbul','current job','senior data scientist','sirket','kariyer','deneyim','calisiyor','nerede','is hayati']},
+  {id:'airlines',title:'Airlines Projects — Pegasus & Turkish Airlines',content:`Pegasus Airlines (2024–2025): In-flight product sales prediction and inventory optimization.
+Impact: 7% monthly profit increase, 20% waste reduction.
+Contributed to GTech being listed among Turkey's 50 Most Innovative Companies.
+Technologies: Machine learning, time series forecasting, optimization.
 
-function detectLang(t){return/[\u00e7\u011f\u0131\u00f6\u015f\u00fc\u00c7\u011e\u0130\u00d6\u015e\u00dc]|\b(merhaba|selam|nas\u0131l|nedir|neler|hakk\u0131nda|bilgi|tecr\u00fcbe|deneyim|e\u011fitim|proje|beceri|yetenek|i\u015f|\u00e7al\u0131\u015f|ne\b|kim|hangi|ka\u00e7|nerede|\u00fcniversite|mezun|sertifika|dil|hobi|anlat|s\u00f6yle)\b/i.test(t)?'tr':'en'}
+Turkish Airlines / THY (2024–2025): Customer segmentation using Google Analytics data + K-Means clustering.`,tags:['airline','pegasus','thy','turkish airlines','flight','aviation','sales prediction','inventory','segmentation','profit','waste','havayolu','ucak','ucus','hava']},
+  {id:'banking',title:'Banking Projects — Kapital Bank, Kuveyt Türk, Vakıf Bank, GarantiBBVA',content:`Kapital Bank Azerbaijan (2025): Customer income group prediction using clustering + classification. Platform: DataIKU.
 
-function ruleAnswer(q){
-const s=q.toLowerCase().replace(/[?!.,;:'"]/g,'');
-const tr=detectLang(q)==='tr';
+Kuveyt Türk & Vakıf Bank (2023–2025): Survival analysis for deposit early redemption & credit prepayment risk.
+Models: Cox Proportional Hazards (Cox PH), Kaplan-Meier, XGBSE. Core deposit ratio modeling.
 
-if(/^(hi|hello|hey|merhaba|selam|selamlar|hey there)\s*$/i.test(s.trim()))
-return tr?'Merhaba! 👋 Ben Ufuk Y\u0131lmaz\u2019\u0131n AI asistan\u0131y\u0131m. Profesyonel ge\u00e7mi\u015fi, projeleri, becerileri veya deneyimi hakk\u0131nda sorular\u0131n\u0131z\u0131 yan\u0131tlayabilirim. Ne sormak istersiniz?'
-:'Hello! 👋 I\'m Ufuk Y\u0131lmaz\'s AI assistant. I can answer questions about his professional background, projects, skills, and experience. What would you like to know?';
+GarantiBBVA (2022–2023): SAS-to-SQL migration for credit risk analytics.
+IFRS9-compliant SQL workflows. Large dataset performance optimization.`,tags:['bank','banking','finance','kapital','kuveyt turk','vakif bank','garanti','garantibbva','credit','risk','ifrs9','sas','survival analysis','deposit','azerbaijan','banka','finans','kredi','mevduat']},
+  {id:'retail',title:'Retail Projects — Beymen & Azure Marketplace',content:`Beymen (2023–2025): Employee shift optimization using ML-based sales predictions.
+Award: 3rd place at RDCONF Turkey 2024 (Best AI Project).
 
-if(/who is ufuk|about ufuk|background|\u00f6zge\u00e7mi\u015f|kim|hakk\u0131nda|ge\u00e7mi\u015f|tan\u0131t|profil|summary|\u00f6zet|tell me about/i.test(s))
-return tr?'**Ufuk Y\u0131lmaz**, \u0130stanbul merkezli **GTECH**\'te \u00e7al\u0131\u015fan bir **K\u0131demli Veri Bilimci**dir (Nisan 2021\'den beri). ODT\u00dc Matematik b\u00f6l\u00fcm\u00fcnden 2021\'de mezun olmu\u015ftur.\n\nHavayolu (Pegasus, THY), perakende (Beymen), bankac\u0131l\u0131k (GarantiBBVA, Kuveyt T\u00fcrk, Vak\u0131f Bank, Kapital Bank) ve Ar-Ge projelerinde \u00e7al\u0131\u015fmaktad\u0131r.\n\n\ud83d\udce7 ylmzz.ufuk@gmail.com\n\ud83d\udd17 [GitHub](https://github.com/ufukyllmaz) \u00b7 [StackOverflow](https://stackoverflow.com/users/16680369)'
-:'**Ufuk Y\u0131lmaz** is a **Senior Data Scientist** at **GTECH** in \u0130stanbul, Turkey (since April 2021). He holds a Mathematics degree from Middle East Technical University (METU), graduated in 2021.\n\nHe works across airlines (Pegasus, Turkish Airlines), retail (Beymen), banking (GarantiBBVA, Kuveyt T\u00fcrk, Vak\u0131f Bank, Kapital Bank), and R&D projects.\n\n\ud83d\udce7 ylmzz.ufuk@gmail.com\n\ud83d\udd17 [GitHub](https://github.com/ufukyllmaz) \u00b7 [StackOverflow](https://stackoverflow.com/users/16680369)';
+Azure Marketplace Demand Forecasting (2021–2022): Customer demand prediction with PySpark on Microsoft Azure.
+Published on Azure Marketplace as an enterprise-grade solution.`,tags:['retail','beymen','shift','optimization','rdconf','award','demand forecasting','azure marketplace','sales','store','perakende','vardiya','magaza']},
+  {id:'rd-ai',title:'R&D & AI/LLM Projects',content:`HR AI Chatbot & Recruitment Automation (2025): End-to-end AI chatbot for 300-employee organization using LLama + ChatGPT APIs with RAG architecture.
+- Automated employee self-service (leave requests, payroll access) via API integrations with HR systems
+- Built intelligent CV screening and candidate matching system for automated job posting and recruitment pipeline
 
-if(/experience|work|i\u015f|tecr\u00fcbe|deneyim|\u00e7al\u0131\u015f|kariyer|career|where.*(work|employ)|nerede.*\u00e7al\u0131\u015f/i.test(s))
-return tr?'Ufuk\'un i\u015f deneyimi:\n\n**1. GTECH \u2014 K\u0131demli Veri Bilimci** (Nisan 2021 \u2013 Devam ediyor, \u0130stanbul)\nHavayolu, perakende, bankac\u0131l\u0131k ve Ar-Ge projelerinde \u00e7al\u0131\u015fmaktad\u0131r. Pegasus i\u00e7in sat\u0131\u015f tahmini (%7 k\u00e2r art\u0131\u015f\u0131), Beymen i\u00e7in vardiya optimizasyonu (RDCONF 2024\'te 3. \u00f6d\u00fcl), GarantiBBVA i\u00e7in SAS\'tan SQL\'e ge\u00e7i\u015f.\n\nAyr\u0131ca Etiyopya DashenBank i\u00e7in veri bilimi e\u011fitimi vermi\u015ftir.\n\n**2. Papilon Savunma \u2014 Ara\u015ft\u0131rma Asistan\u0131** (Kas 2020 \u2013 Mar 2021)\nYOLOv3 ile plaka tan\u0131ma sistemi.\n\n**3. Papilon Savunma \u2014 Yaz\u0131l\u0131m Stajyeri** (Tem 2020 \u2013 Eyl 2020)'
-:'Ufuk\'s work experience:\n\n**1. GTECH \u2014 Senior Data Scientist** (Apr 2021 \u2013 Present, \u0130stanbul)\nWorks across airlines, retail, banking and R&D. Key highlights: Pegasus sales prediction (7% profit increase), Beymen shift optimization (3rd place RDCONF Turkey 2024), GarantiBBVA SAS-to-SQL migration.\n\nAlso delivered data science training at DashenBank Ethiopia.\n\n**2. Papilon Savunma \u2014 Research Assistant** (Nov 2020 \u2013 Mar 2021)\nYOLOv3 plate detection system.\n\n**3. Papilon Savunma \u2014 Software Developer Intern** (Jul \u2013 Sep 2020)';
+SafeRoute-6G (2025): Advanced road safety infrastructure toward 6G technology.
+- Fuel consumption estimation, safe rest stop identification, and traffic accident black spot detection
 
-if(/skill|beceri|yetenek|teknoloji|technology|tech.?stack|ara\u00e7|tool|what.*(know|use)|ne.*(bil|kullan)/i.test(s))
-return tr?'Ufuk\'un teknik becerileri:\n\n**Programlama:** Python, SQL, SAS\n**ML/DL:** Scikit-learn, XGBoost, LightGBM, CatBoost, Keras, TensorFlow\n**Big Data:** Spark, PySpark, Hadoop, Hive, HDFS, Impala, Druid\n**AI/LLM:** LangChain, LlamaIndex, RAG, NL2SQL\n**G\u00f6r\u00fcnt\u00fc \u0130\u015fleme:** OpenCV, YOLOv3, PyTesseract\n**Platform:** Microsoft Azure, DataIKU, Cloudera, Linux\n**G\u00f6rselle\u015ftirme:** Apache Superset'
-:'Ufuk\'s technical skills:\n\n**Programming:** Python, SQL, SAS\n**ML/DL:** Scikit-learn, XGBoost, LightGBM, CatBoost, Keras, TensorFlow\n**Big Data:** Spark, PySpark, Hadoop, Hive, HDFS, Impala, Druid\n**AI/LLM:** LangChain, LlamaIndex, RAG, NL2SQL\n**Computer Vision:** OpenCV, YOLOv3, PyTesseract\n**Platforms:** Microsoft Azure, DataIKU, Cloudera, Linux\n**Visualization:** Apache Superset';
+Text-to-SQL / NL2SQL (2024): Generative AI system using LangChain and LlamaIndex for natural language database querying.
+- Implemented NL2SQL and Text2SQL techniques to improve accuracy for non-technical users`,tags:['ai','llm','rag','chatbot','langchain','llamaindex','gpt','llama','nlp','text-to-sql','nl2sql','generative','research','development','yapay zeka','ar-ge','dil modeli','saferoute','recruitment','hr','hiring']},
+  {id:'bigdata',title:'Big Data & Cloud',content:`Big Data Pipeline (2021–2022): Real-time data pipeline using Cloudera: Python, HDFS, Hive, Impala, Druid, Apache Superset.
 
-if(/education|e\u011fitim|university|\u00fcniversite|school|okul|degree|mezun|diploma|academic|akademik|odt\u00fc|metu/i.test(s))
-return tr?'**E\u011fitim:** Matematik Lisans \u2014 Orta Do\u011fu Teknik \u00dcniversitesi (ODT\u00dc), Ankara, 2021\n\n**Sertifikalar:**\n- Azure Data Scientist Associate (Microsoft, 2024-2025)\n- SAS Programming (Coursera, 2022)\n\n**Konferanslar:**\n- Big Data Academy - GTECH (2021)\n- Kuantum Programlama - QTURKEY (2020)\n- Kriptografi Yaz Okulu (2019)'
-:'**Education:** Mathematics BSc \u2014 Middle East Technical University (METU), Ankara, 2021\n\n**Certifications:**\n- Azure Data Scientist Associate (Microsoft, 2024-2025)\n- SAS Programming (Coursera, 2022)\n\n**Conferences:**\n- Big Data Academy - GTECH (2021)\n- Quantum Programming Workshop - QTURKEY (2020)\n- Cryptography Summer School (2019)';
+Azure Marketplace Demand Forecasting: Scalable PySpark solution published on Azure Marketplace.
 
-if(/project|proje|portfolio|portf\u00f6y|what.*(built|made|develop|create)|ne.*(yap|geli\u015ftir|olu\u015ftur)/i.test(s))
-return tr?'Ufuk\'un \u00f6ne \u00e7\u0131kan projeleri:\n\n**Havayolu:**\n- \ud83d\udee9 **Pegasus** \u2014 U\u00e7ak i\u00e7i sat\u0131\u015f tahmini (%7 k\u00e2r\u2191, %20 israf\u2193)\n- \u2708\ufe0f **THY** \u2014 M\u00fc\u015fteri segmentasyonu (K-Means)\n\n**Perakende:**\n- \ud83c\udfea **Beymen** \u2014 Vardiya optimizasyonu (RDCONF 2024 3. \u00f6d\u00fcl)\n- \ud83d\udcca Azure Marketplace talep tahmin \u00e7\u00f6z\u00fcm\u00fc\n\n**Bankac\u0131l\u0131k:**\n- \ud83c\udfe6 **Kapital Bank** \u2014 Gelir tahmini (DataIKU)\n- \ud83c\udfe6 **Kuveyt T\u00fcrk & Vak\u0131f Bank** \u2014 Survival analizi\n- \ud83c\udfe6 **GarantiBBVA** \u2014 SAS\u2192SQL (IFRS9)\n\n**Ar-Ge:**\n- \ud83e\udd16 HR AI Chatbot (RAG, LLama, ChatGPT)\n- \ud83d\udee3\ufe0f SafeRoute-6G\n- \ud83d\udcac Text-to-SQL (LangChain)\n\n**Ki\u015fisel:**\n- \ud83c\udfc6 Do\u011fu\u015f Otomotiv Kaggle \u2014 2. s\u0131ra'
-:'Ufuk\'s notable projects:\n\n**Airlines:**\n- \ud83d\udee9 **Pegasus** \u2014 In-flight sales prediction (7% profit\u2191, 20% waste\u2193)\n- \u2708\ufe0f **Turkish Airlines** \u2014 Customer segmentation (K-Means)\n\n**Retail:**\n- \ud83c\udfea **Beymen** \u2014 Shift optimization (3rd place RDCONF 2024)\n- \ud83d\udcca Azure Marketplace demand forecasting\n\n**Banking:**\n- \ud83c\udfe6 **Kapital Bank** \u2014 Income estimation (DataIKU)\n- \ud83c\udfe6 **Kuveyt T\u00fcrk & Vak\u0131f Bank** \u2014 Survival analysis\n- \ud83c\udfe6 **GarantiBBVA** \u2014 SAS\u2192SQL migration (IFRS9)\n\n**R&D:**\n- \ud83e\udd16 HR AI Chatbot (RAG, LLama, ChatGPT)\n- \ud83d\udee3\ufe0f SafeRoute-6G\n- \ud83d\udcac Text-to-SQL (LangChain)\n\n**Personal:**\n- \ud83c\udfc6 Do\u011fu\u015f Otomotiv Kaggle \u2014 2nd place overall';
+Big Data Academy (GTECH 2021): Training in Hadoop, Apache Kafka, Cassandra, MongoDB, Striim.`,tags:['big data','hadoop','spark','pyspark','cloudera','hive','hdfs','impala','druid','kafka','pipeline','cloud','azure','buyuk veri','veri boru']},
+  {id:'vision',title:'Computer Vision & Personal Projects',content:`License Plate Detection (Papilon Savunma, 2020–2021): Real-time plate detection using YOLOv3 (DarkNet-53, 53 conv layers).
+Data collected via web scraping + manual labeling per letter and number.
 
-if(/bank|banka|finans|finance|credit|kredi|risk|deposit|mevduat|ifrs|sas|kapital|garanti|kuveyt|vak\u0131f/i.test(s))
-return tr?'Ufuk\'un bankac\u0131l\u0131k projeleri:\n\n**1. Kapital Bank Azerbaycan (2025)** \u2014 M\u00fc\u015fteri gelir grubu tahmini, clustering + s\u0131n\u0131fland\u0131rma, DataIKU.\n\n**2. Kuveyt T\u00fcrk & Vak\u0131f Bank (2023-2025)** \u2014 Vadeli mevduat erken kapanma ve kredi \u00f6n \u00f6deme riski. Cox PH, Kaplan-Meier, XGBSE modelleri. \u00c7ekirdek mevduat oranlar\u0131.\n\n**3. GarantiBBVA (2022-2023)** \u2014 SAS\u2019tan SQL\u2019e ge\u00e7i\u015f, b\u00fcy\u00fck veri performans optimizasyonu, IFRS9 uyumlu SQL i\u015f ak\u0131\u015flar\u0131.'
-:'Ufuk\'s banking projects:\n\n**1. Kapital Bank Azerbaijan (2025)** \u2014 Income group prediction using clustering + classification, DataIKU.\n\n**2. Kuveyt T\u00fcrk & Vak\u0131f Bank (2023-2025)** \u2014 Deposit early redemption & credit prepayment risk. Cox PH, Kaplan-Meier, XGBSE models. Core deposit ratios.\n\n**3. GarantiBBVA (2022-2023)** \u2014 SAS to SQL migration for credit risk analytics. Large dataset optimization, IFRS9-compliant workflows.';
+OCR System: Extracted text from hand-written notes using PyTesseract + OpenCV. Image preprocessing for improved accuracy. Converted extracted text into structured format.
+Tech: Python, PyTesseract, OpenCV
 
-if(/airline|havayol|u\u00e7ak|flight|u\u00e7u\u015f|pegasus|thy|turkish airline/i.test(s))
-return tr?'Ufuk\'un havayolu projeleri:\n\n**1. Pegasus Airlines (2024-2025)** \u2014 U\u00e7ak i\u00e7i \u00fcr\u00fcn sat\u0131\u015f tahmini ve envanter optimizasyonu. Ayl\u0131k k\u00e2rda %7 art\u0131\u015f, israfta %20 azalma. GTech\'in T\u00fcrkiye\'nin en yenilik\u00e7i 50 \u015firketi aras\u0131na girmesine katk\u0131.\n\n**2. T\u00fcrk Hava Yollar\u0131 (2024-2025)** \u2014 Google Analytics + denetimsiz \u00f6\u011frenme ile m\u00fc\u015fteri segmentasyonu. K-Means clustering.'
-:'Ufuk\'s airline projects:\n\n**1. Pegasus Airlines (2024-2025)** \u2014 In-flight sales prediction & inventory optimization. 7% monthly profit increase, 20% waste reduction. Contributed to GTech being named among Turkey\'s 50 most innovative companies.\n\n**2. Turkish Airlines (2024-2025)** \u2014 Customer segmentation using Google Analytics + unsupervised learning. K-Means clustering.';
+Web Scraping — Volleyball Players Dataset: Comprehensive dataset of world volleyball players extracted from a dedicated website using Selenium + BeautifulSoup.
+Tech: Python, Selenium, BeautifulSoup`,tags:['computer vision','opencv','yolo','yolov3','plate detection','license plate','ocr','tesseract','image processing','object detection','web scraping','selenium','beautifulsoup','volleyball','goruntu isleme','plaka tespiti','veri toplama']},
+  {id:'achievements',title:'Achievements & Awards',content:`RDCONF Turkey 2024 — 3rd place, Best AI Project (Beymen shift optimization)
+Doğuş Otomotiv Datathon — 9th place in initial evaluation phase, 2nd place overall in final stage (LightGBM + CatBoost + XGBoost)
+Link: https://www.kaggle.com/competitions/dogus-datathon-otomotiv/leaderboard
+Turkey's 50 Most Innovative Companies — GTech listed thanks to Ufuk's Pegasus Airlines project
+Azure Marketplace — Published enterprise-grade demand forecasting solution
+DashenBank Ethiopia — On-site data science training for 8 banking professionals
+Azure Data Scientist Associate — Microsoft certified (Credential ID: B94692A4FE34A7EC)`,tags:['achievement','award','rdconf','datathon','dogus otomotiv','competition','prize','innovative','marketplace','ethiopia','kaggle','leaderboard','odul','basari','yarismali','kazanim']},
+  {id:'papilon',title:'Papilon Savunma — Research Assistant & Intern',content:`Research Assistant (November 2020 – March 2021):
+YOLOv3 real-time license plate detection using DarkNet-53 backbone. Web scraping for data collection + manual data labeling.
 
-if(/achievement|award|\u00f6d\u00fcl|ba\u015far\u0131|accomplishment|recognition|kazan\u0131m|innovati|prize/i.test(s))
-return tr?'\ud83c\udfc6 **RDCONF Turkey 2024** \u2014 En iyi AI projesi 3. \u00f6d\u00fcl (Beymen)\n\ud83c\udfc6 **Do\u011fu\u015f Otomotiv Datathon** \u2014 Genel 2. s\u0131ra\n\ud83c\udf1f **T\u00fcrkiye\'nin En Yenilik\u00e7i 50 \u015eirketi** \u2014 GTech\'in listeye girmesine katk\u0131\n\ud83d\udcca **Azure Marketplace** \u2014 Talep tahmin \u00e7\u00f6z\u00fcm\u00fc yay\u0131nland\u0131\n\ud83c\udf0d **DashenBank Etiyopya** \u2014 8 profesyonele veri bilimi e\u011fitimi\n\ud83d\udcdc **Azure Data Scientist Associate** sertifikas\u0131'
-:'\ud83c\udfc6 **RDCONF Turkey 2024** \u2014 3rd place best AI project (Beymen)\n\ud83c\udfc6 **Do\u011fu\u015f Otomotiv Datathon** \u2014 2nd place overall\n\ud83c\udf1f **Turkey\'s 50 Most Innovative Companies** \u2014 Contributed to GTech\'s recognition\n\ud83d\udcca **Azure Marketplace** \u2014 Published demand forecasting solution\n\ud83c\udf0d **DashenBank Ethiopia** \u2014 On-site data science training for 8 professionals\n\ud83d\udcdc **Azure Data Scientist Associate** certification (Microsoft)';
+Software Developer Intern (July – September 2020): Software development internship.`,tags:['papilon','defense','research assistant','internship','intern','plate detection','yolov3','savunma','staj','arastirma']},
+  {id:'training',title:'International Training — DashenBank Ethiopia',content:`DashenBank Ethiopia (on-site): Designed and delivered comprehensive data science curriculum for DashenBank in Ethiopia.
+- Trained 8 professionals in Machine Learning and Statistical Analysis
+- Developed hands-on projects to reinforce practical application of concepts`,tags:['training','teaching','dashen','ethiopia','curriculum','mentorship','international','machine learning','statistics','egitim','ogretim','etiyopya','addis ababa']}
+];
 
-if(/ai\b|llm|generative|genai|chatbot|rag|langchain|llama|gpt|yapay zeka|b\u00fcy\u00fck dil model/i.test(s))
-return tr?'Ufuk\'un AI/LLM projeleri:\n\n**1. HR AI Chatbot (2025)** \u2014 300 \u00e7al\u0131\u015fanl\u0131 organizasyon i\u00e7in LLama + ChatGPT API ile RAG mimarisinde chatbot. \u00c7al\u0131\u015fan self-servis ve ak\u0131ll\u0131 CV tarama sistemi.\n\n**2. Text-to-SQL (2024)** \u2014 LangChain ve LlamaIndex ile do\u011fal dilde veritaban\u0131 sorgulama. NL2SQL teknikleri.'
-:'Ufuk\'s AI/LLM projects:\n\n**1. HR AI Chatbot (2025)** \u2014 End-to-end chatbot for 300-employee org using LLama + ChatGPT APIs with RAG architecture. Employee self-service and intelligent CV screening.\n\n**2. Text-to-SQL (2024)** \u2014 Natural language database querying using LangChain and LlamaIndex. NL2SQL and Text2SQL techniques.';
+// ═══════════════════════════════════════
+// LANGUAGE DETECTION
+// ═══════════════════════════════════════
+function detectLang(t){return/[çğışöüÇĞİÖŞÜ]|\b(merhaba|selam|nasıl|nedir|neler|hakkında|bilgi|tecrübe|deneyim|eğitim|proje|beceri|yetenek|iş|çalış|ne\b|kim|hangi|kaç|nerede|üniversite|mezun|sertifika|dil|hobi|anlat|söyle|var|olan|için)\b/i.test(t)?'tr':'en'}
 
-if(/contact|ileti\u015fim|email|mail|phone|telefon|reach|ula\u015f|github|stack/i.test(s))
-return tr?'\ud83d\udce7 **Email:** ylmzz.ufuk@gmail.com\n\ud83d\udcf1 **Telefon:** (+90) 5054410838\n\ud83d\udd17 **GitHub:** [github.com/ufukyllmaz](https://github.com/ufukyllmaz)\n\ud83d\udd17 **StackOverflow:** [Profil](https://stackoverflow.com/users/16680369)'
-:'\ud83d\udce7 **Email:** ylmzz.ufuk@gmail.com\n\ud83d\udcf1 **Phone:** (+90) 5054410838\n\ud83d\udd17 **GitHub:** [github.com/ufukyllmaz](https://github.com/ufukyllmaz)\n\ud83d\udd17 **StackOverflow:** [Profile](https://stackoverflow.com/users/16680369)';
+// ═══════════════════════════════════════
+// RETRIEVAL (BM25-style keyword scoring)
+// ═══════════════════════════════════════
+const STOPS=new Set('the a an is are was were be been have has do does did will would could should may might of in on at to for with by from about into through and or but if then than so yet i you he she it we they me him her us them what which who whom this that these those my your his its our their tell me please can how any all some had more most other such no only also just like up out get when where why how ne ve bir bu da de mi için var olan ile kim bu den dan ufuk yilmaz yılmaz'.split(' '));
 
-if(/certif|sertifika|azure|credential/i.test(s))
-return tr?'**1. Azure Data Scientist Associate** \u2014 Microsoft (2024-2025)\n[Sertifika](https://learn.microsoft.com/api/credentials/share/en-gb/ufukyilmaz/B94692A4FE34A7EC?sharingId=17324A185EA8A07E)\n\n**2. SAS Programming** \u2014 Coursera (2022)\n[Sertifika](https://coursera.org/share/fd5f6a0676d5327b959813f653949426)'
-:'**1. Azure Data Scientist Associate** \u2014 Microsoft (2024-2025)\n[View Credential](https://learn.microsoft.com/api/credentials/share/en-gb/ufukyilmaz/B94692A4FE34A7EC?sharingId=17324A185EA8A07E)\n\n**2. SAS Programming** \u2014 Coursera (2022)\n[View Credential](https://coursera.org/share/fd5f6a0676d5327b959813f653949426)';
+function tokenize(t){
+  return t.toLowerCase().replace(/[.,!?;:'"()[\]{}<>]/g,' ').split(/\s+/).filter(w=>w.length>1&&!STOPS.has(w));
+}
 
-if(/language|dil|speak|konu\u015f|english|turkish|t\u00fcrk\u00e7e|ingilizce/i.test(s))
-return tr?'\ud83c\uddf9\ud83c\uddf7 **T\u00fcrk\u00e7e** \u2014 Ana dil\n\ud83c\uddec\ud83c\udde7 **\u0130ngilizce** \u2014 \u0130leri d\u00fczey':'\ud83c\uddf9\ud83c\uddf7 **Turkish** \u2014 Native\n\ud83c\uddec\ud83c\udde7 **English** \u2014 Proficient';
-
-if(/hobb|hobi|interest|ilgi|free time|bo\u015f zaman|tennis|tenis/i.test(s))
-return tr?'Ufuk\'un hobisi: \ud83c\udfbe **Tenis**':'Ufuk\'s hobby: \ud83c\udfbe **Tennis**';
-
-if(/retail|perakende|beymen|ma\u011faza|store|shift|vardiya/i.test(s))
-return tr?'**1. Beymen (2023-2025)** \u2014 Sat\u0131\u015f tahminlerine dayal\u0131 vardiya optimizasyonu. **RDCONF Turkey 2024\'te 3. \u00f6d\u00fcl.**\n\n**2. Talep Tahmini (2021-2022)** \u2014 PySpark + Azure ile m\u00fc\u015fteri talep tahmini. **Azure Marketplace**\'te yay\u0131nland\u0131.'
-:'**1. Beymen (2023-2025)** \u2014 Shift optimization based on sales predictions. **Won 3rd place at RDCONF Turkey 2024.**\n\n**2. Demand Forecasting (2021-2022)** \u2014 Customer demand prediction with PySpark on Azure. Published on **Azure Marketplace**.';
-
-if(/gtech|\u015firket|company|firma|nerede \u00e7al\u0131\u015f|where.*work/i.test(s))
-return tr?'Ufuk, **GTECH** \u015firketinde **K\u0131demli Veri Bilimci** olarak Nisan 2021\'den beri \u0130stanbul\'da \u00e7al\u0131\u015fmaktad\u0131r.'
-:'Ufuk works at **GTECH** as a **Senior Data Scientist** since April 2021, based in \u0130stanbul, Turkey.';
-
-if(/how many.*(year|experience)|ka\u00e7.*(y\u0131l|sene|tecr\u00fcbe)|experience.*year/i.test(s)){
-const y=new Date().getFullYear()-2021;
-return tr?`Ufuk, veri bilimi alan\u0131nda **${y}+ y\u0131l** profesyonel deneyime sahiptir (Nisan 2021\'den beri).`
-:`Ufuk has **${y}+ years** of professional experience in data science (since April 2021).`;}
-
-if(/big data|b\u00fcy\u00fck veri|hadoop|spark|pipeline|hive|cloudera/i.test(s))
-return tr?'Ufuk\'un Big Data deneyimi:\n\n**Big Data Pipeline Projesi (2021)** \u2014 Cloudera ekosistemi ile ger\u00e7ek zamanl\u0131 veri hatt\u0131: Python, HDFS, Hive, Impala, Druid, Superset.\n\n**Talep Tahmini** \u2014 PySpark ile Microsoft Azure \u00fczerinde \u00f6l\u00e7eklenebilir \u00e7\u00f6z\u00fcm.\n\n**Big Data Academy (2021)** \u2014 Hadoop, Apache Kafka, Cassandra, MongoDB, Striim e\u011fitimi.'
-:'Ufuk\'s Big Data experience:\n\n**Big Data Pipeline (2021)** \u2014 Real-time pipeline using Cloudera: Python, HDFS, Hive, Impala, Druid, Superset.\n\n**Demand Forecasting** \u2014 Scalable solution with PySpark on Microsoft Azure.\n\n**Big Data Academy (2021)** \u2014 Training in Hadoop, Apache Kafka, Cassandra, MongoDB, Striim.';
-
-if(/computer vision|g\u00f6r\u00fcnt\u00fc|image|ocr|yolo|plate|plaka|opencv/i.test(s))
-return tr?'Ufuk\'un g\u00f6r\u00fcnt\u00fc i\u015fleme projeleri:\n\n**1. Plaka Tan\u0131ma (Papilon Savunma, 2020-2021)** \u2014 YOLOv3 (DarkNet-53) ile ger\u00e7ek zamanl\u0131 plaka tespiti. Web scraping ile veri toplama ve etiketleme.\n\n**2. OCR Sistemi** \u2014 El yaz\u0131s\u0131 notlardan metin \u00e7\u0131karma. PyTesseract ve OpenCV.'
-:'Ufuk\'s computer vision projects:\n\n**1. Plate Detection (Papilon Savunma, 2020-2021)** \u2014 Real-time plate detection using YOLOv3 (DarkNet-53 backbone). Data collection via web scraping and labeling.\n\n**2. OCR System** \u2014 Text extraction from hand-written notes using PyTesseract and OpenCV.';
-
-return tr?'Bu konuda CV\'de spesifik bilgi bulamad\u0131m. \u015eu konular\u0131 sorabilirsiniz:\n\n- \ud83d\udcbc \u0130\u015f deneyimi\n- \u26a1 Teknik beceriler\n- \ud83c\udf93 E\u011fitim ve sertifikalar\n- \ud83c\udfc6 Ba\u015far\u0131lar\n- \ud83d\udcde \u0130leti\u015fim bilgileri\n- \ud83e\udd16 AI/LLM projeleri\n- \ud83c\udfe6 Bankac\u0131l\u0131k projeleri\n- \u2708\ufe0f Havayolu projeleri'
-:'I couldn\'t find specific info about that in the CV. Try asking about:\n\n- \ud83d\udcbc Work experience\n- \u26a1 Technical skills\n- \ud83c\udf93 Education & certifications\n- \ud83c\udfc6 Achievements\n- \ud83d\udcde Contact info\n- \ud83e\udd16 AI/LLM projects\n- \ud83c\udfe6 Banking projects\n- \u2708\ufe0f Airline projects';
+function retrieve(query,k=3){
+  // Greetings: skip retrieval
+  if(/^(hi|hello|hey|merhaba|selam|selamlar)\s*[!?.]*$/i.test(query.trim()))return[];
+  const qt=tokenize(query);
+  if(!qt.length)return KB.slice(0,k);
+  const ql=query.toLowerCase();
+  const scored=KB.map(c=>{
+    let s=0;
+    // Tag match — highest weight
+    c.tags.forEach(tag=>{
+      if(ql.includes(tag))s+=6;
+      else if(tag.split(' ').some(w=>qt.includes(w)))s+=3;
+    });
+    // Token overlap in content
+    const ct=new Set(tokenize(c.content+' '+c.tags.join(' ')));
+    qt.forEach(w=>{if(ct.has(w))s+=2});
+    return{c,s};
+  }).sort((a,b)=>b.s-a.s);
+  const top=scored.filter(x=>x.s>0).slice(0,k);
+  return(top.length?top:scored.slice(0,2)).map(x=>x.c);
 }
 
 // ═══════════════════════════════════════
-// HUGGING FACE API
+// FALLBACK — build response from chunks
 // ═══════════════════════════════════════
-const HF_MODELS=["mistralai/Mistral-7B-Instruct-v0.3","HuggingFaceH4/zephyr-7b-beta","microsoft/Phi-3-mini-4k-instruct"];
+function buildFallback(chunks,query){
+  const tr=detectLang(query)==='tr';
+  if(!chunks.length)
+    return tr?'Merhaba! 👋 Ben Ufuk Yılmaz\'ın AI asistanıyım. İş deneyimi, beceriler, projeler veya eğitim hakkında sorabilirsiniz.'
+             :'Hello! 👋 I\'m Ufuk Yılmaz\'s AI assistant. Ask me about his experience, skills, projects, or education.';
+  const header=tr?'Sorgunuzla ilgili bilgiler:\n\n':'Here\'s what I found:\n\n';
+  return header+chunks.map(c=>`**${c.title}**\n${c.content}`).join('\n\n---\n\n');
+}
+
+// ═══════════════════════════════════════
+// HUGGING FACE API (model-specific prompts)
+// ═══════════════════════════════════════
+const HF_MODELS=['mistralai/Mistral-7B-Instruct-v0.3','HuggingFaceH4/zephyr-7b-beta','microsoft/Phi-3-mini-4k-instruct'];
 let modelIdx=0,hfOk=true,hfFails=0;
 
-async function queryHF(msg,retry=0){
-const model=HF_MODELS[modelIdx];
-const lang=detectLang(msg);
-const langNote=lang==='tr'?'User asked in Turkish. Respond in Turkish.':'User asked in English. Respond in English.';
-const prompt=`<|system|>\nYou are Ufuk Yilmaz's CV assistant. Answer ONLY from CV data below. Be concise & professional. ${langNote} Never invent info.\n\nCV:\n${CV_TEXT}\n</s>\n<|user|>\n${msg}\n</s>\n<|assistant|>\n`;
+function buildPrompt(model,context,query,lang){
+  const ln=lang==='tr'?'Türkçe ve kısa yanıt ver.':'Answer in English. Be concise.';
+  const sys=`You are Ufuk Yilmaz's CV assistant. Answer ONLY from the provided context. Never invent information. ${ln}`;
+  const usr=`Context:\n${context}\n\nQuestion: ${query}`;
+  if(model.includes('Mistral')||model.includes('mistral'))
+    return`[INST] ${sys}\n\n${usr} [/INST]`;
+  if(model.includes('zephyr')||model.includes('Zephyr'))
+    return`<|system|>\n${sys}\n</s>\n<|user|>\n${usr}\n</s>\n<|assistant|>\n`;
+  // Phi-3
+  return`<|user|>\n${sys}\n\n${usr}<|end|>\n<|assistant|>\n`;
+}
 
-try{
-const r=await fetch(`https://api-inference.huggingface.co/models/${model}`,{
-method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({inputs:prompt,parameters:{max_new_tokens:500,temperature:0.3,top_p:0.9,return_full_text:false,do_sample:true}})
-});
-if(r.status===503){if(retry<2){await new Promise(r=>setTimeout(r,3000));return queryHF(msg,retry+1)}if(modelIdx<HF_MODELS.length-1){modelIdx++;return queryHF(msg,0)}return null}
-if(r.status===429){if(modelIdx<HF_MODELS.length-1){modelIdx++;return queryHF(msg,0)}return null}
-if(!r.ok)return null;
-const d=await r.json();
-if(Array.isArray(d)&&d[0]?.generated_text){let t=d[0].generated_text.trim().replace(/<\|.*?\|>/g,'').replace(/<\/s>/g,'').trim();if(t.length>30){hfFails=0;return t}}
-return null;
-}catch(e){console.warn('HF error:',e);return null}}
+async function queryHF(context,query,retry=0){
+  const model=HF_MODELS[modelIdx];
+  const lang=detectLang(query);
+  const prompt=buildPrompt(model,context,query,lang);
+  try{
+    const r=await fetch(`https://api-inference.huggingface.co/models/${model}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({inputs:prompt,parameters:{max_new_tokens:400,temperature:0.3,top_p:0.9,return_full_text:false,do_sample:true}})
+    });
+    if(r.status===503){
+      if(retry<2){await new Promise(res=>setTimeout(res,3000));return queryHF(context,query,retry+1)}
+      if(modelIdx<HF_MODELS.length-1){modelIdx++;return queryHF(context,query,0)}
+      return null;
+    }
+    if(r.status===429){
+      if(modelIdx<HF_MODELS.length-1){modelIdx++;return queryHF(context,query,0)}
+      return null;
+    }
+    if(!r.ok)return null;
+    const d=await r.json();
+    if(Array.isArray(d)&&d[0]?.generated_text){
+      let t=d[0].generated_text.trim().replace(/<\|.*?\|>/g,'').replace(/<\/s>/g,'').replace(/\[\/INST\]/g,'').trim();
+      if(t.length>20){hfFails=0;return t}
+    }
+    return null;
+  }catch(e){console.warn('HF error:',e);return null}
+}
 
 // ═══════════════════════════════════════
 // CHAT ENGINE
@@ -239,59 +287,76 @@ function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrol
 function sendSuggestion(t){document.getElementById('chatInput').value=t;document.getElementById('sendBtn').disabled=false;sendMessage()}
 
 async function sendMessage(){
-const input=document.getElementById('chatInput');
-const text=input.value.trim();
-if(!text||loading)return;
-const w=document.getElementById('welcomeSection');if(w)w.style.display='none';
-addMsg(text,'user');input.value='';input.style.height='auto';document.getElementById('sendBtn').disabled=true;
-loading=true;
-document.getElementById('typingIndicator').classList.add('visible');scrollBottom();
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text||loading)return;
+  const w=document.getElementById('welcomeSection');if(w)w.style.display='none';
+  addMsg(text,'user');input.value='';input.style.height='auto';document.getElementById('sendBtn').disabled=true;
+  loading=true;
+  document.getElementById('typingIndicator').classList.add('visible');scrollBottom();
 
-let reply=null,usedAI=false;
-if(hfOk&&hfFails<5){
-try{reply=await Promise.race([queryHF(text),new Promise((_,rej)=>setTimeout(()=>rej('timeout'),15000))]);if(reply)usedAI=true}catch(e){reply=null}
-if(!reply)hfFails++;if(hfFails>=5)hfOk=false}
-if(!reply){reply=ruleAnswer(text);usedAI=false}
+  // ── STEP 1: RETRIEVE relevant knowledge chunks ──
+  const chunks=retrieve(text);
+  const context=chunks.map(c=>`[${c.title}]\n${c.content}`).join('\n\n---\n\n');
 
-document.getElementById('typingIndicator').classList.remove('visible');
-addMsg(reply,'bot');
-document.getElementById('modeIndicator').innerHTML=usedAI?'✨ Answered by AI (Hugging Face)':'⚡ Instant answer (built-in knowledge)';
-loading=false;
+  // ── STEP 2: AUGMENT + GENERATE with LLM ──
+  let reply=null,usedAI=false;
+  if(hfOk&&hfFails<5&&chunks.length>0){
+    try{
+      reply=await Promise.race([
+        queryHF(context,text),
+        new Promise((_,rej)=>setTimeout(()=>rej('timeout'),15000))
+      ]);
+      if(reply)usedAI=true;
+    }catch(e){reply=null}
+    if(!reply){hfFails++;if(hfFails>=5)hfOk=false}
+  }
+
+  // ── STEP 3: FALLBACK — use retrieved chunks directly ──
+  if(!reply)reply=buildFallback(chunks,text);
+
+  document.getElementById('typingIndicator').classList.remove('visible');
+  addMsg(reply,'bot');
+  const src=usedAI
+    ?`✨ AI generated · RAG (${chunks.length} chunk${chunks.length!==1?'s':''} retrieved)`
+    :(chunks.length?'⚡ Retrieved from knowledge base':'💬 Greeting');
+  document.getElementById('modeIndicator').innerHTML=src;
+  loading=false;
 }
 
 function addMsg(content,type){
-const msgs=document.getElementById('messages');
-const m=document.createElement('div');m.className='message '+type;
-const av=document.createElement('div');av.className='msg-avatar';av.textContent=type==='bot'?'U':'👤';
-const b=document.createElement('div');b.className='msg-bubble';
-b.innerHTML=type==='bot'?fmtMd(content):escHtml(content);
-m.appendChild(av);m.appendChild(b);msgs.appendChild(m);scrollBottom();
+  const msgs=document.getElementById('messages');
+  const m=document.createElement('div');m.className='message '+type;
+  const av=document.createElement('div');av.className='msg-avatar';av.textContent=type==='bot'?'U':'👤';
+  const b=document.createElement('div');b.className='msg-bubble';
+  b.innerHTML=type==='bot'?fmtMd(content):escHtml(content);
+  m.appendChild(av);m.appendChild(b);msgs.appendChild(m);scrollBottom();
 }
 
 function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
 
 function fmtMd(t){
-let h=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`(.*?)`/g,'<code>$1</code>').replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-return h.split(/\n\n+/).map(p=>{
-const lines=p.split('\n');
-if(lines.every(l=>/^\s*[-•]/.test(l)||!l.trim())&&lines.some(l=>/^\s*[-•]/.test(l)))
-return '<ul>'+lines.filter(l=>/^\s*[-•]/.test(l)).map(l=>'<li>'+l.trim().replace(/^[-•]\s*/,'')+'</li>').join('')+'</ul>';
-if(lines.every(l=>/^\d+\.\s/.test(l.trim())||!l.trim())&&lines.some(l=>/^\d+\.\s/.test(l.trim())))
-return '<ol>'+lines.filter(l=>/^\d+\.\s/.test(l.trim())).map(l=>'<li>'+l.trim().replace(/^\d+\.\s*/,'')+'</li>').join('')+'</ol>';
-return '<p>'+p.replace(/\n/g,'<br>')+'</p>';
-}).join('');
+  let h=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`(.*?)`/g,'<code>$1</code>').replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return h.split(/\n\n+/).map(p=>{
+    const lines=p.split('\n');
+    if(lines.every(l=>/^\s*[-•]/.test(l)||!l.trim())&&lines.some(l=>/^\s*[-•]/.test(l)))
+      return'<ul>'+lines.filter(l=>/^\s*[-•]/.test(l)).map(l=>'<li>'+l.trim().replace(/^[-•]\s*/,'')+'</li>').join('')+'</ul>';
+    if(lines.every(l=>/^\d+\.\s/.test(l.trim())||!l.trim())&&lines.some(l=>/^\d+\.\s/.test(l.trim())))
+      return'<ol>'+lines.filter(l=>/^\d+\.\s/.test(l.trim())).map(l=>'<li>'+l.trim().replace(/^\d+\.\s*/,'')+'</li>').join('')+'</ol>';
+    return'<p>'+p.replace(/\n/g,'<br>')+'</p>';
+  }).join('');
 }
 
-function scrollBottom(){const c=document.getElementById('chatContainer');requestAnimationFrame(()=>{c.scrollTop=c.scrollHeight})}
+function scrollBottom(){const c=document.getElementById('chatContainer');requestAnimationFrame(()=>requestAnimationFrame(()=>{c.scrollTop=c.scrollHeight}))}
 
 function clearChat(){
-hfFails=0;hfOk=true;modelIdx=0;
-document.getElementById('messages').innerHTML=`<div class="welcome-section" id="welcomeSection"><div class="welcome-avatar">UY</div><h2>Hi, I'm Ufuk's AI Assistant 👋</h2><p>I can answer questions about Ufuk Yılmaz's professional background, skills, projects, and experience. Ask me in English or Turkish!</p><div class="welcome-chips"><div class="welcome-chip" onclick="sendSuggestion('What is Ufuk\\'s professional background?')"><span class="chip-icon">💼</span> Professional background</div><div class="welcome-chip" onclick="sendSuggestion('What projects has Ufuk worked on?')"><span class="chip-icon">🚀</span> Projects & achievements</div><div class="welcome-chip" onclick="sendSuggestion('What are Ufuk\\'s technical skills?')"><span class="chip-icon">⚡</span> Technical skills</div><div class="welcome-chip" onclick="sendSuggestion('Ufuk\\'un eğitim geçmişi nedir?')"><span class="chip-icon">🎓</span> Eğitim geçmişi</div></div></div>`;
-document.getElementById('modeIndicator').innerHTML='✨ Free & open-source · No API key needed';
+  hfFails=0;hfOk=true;modelIdx=0;
+  document.getElementById('messages').innerHTML=`<div class="welcome-section" id="welcomeSection"><div class="welcome-avatar">UY</div><h2>Hi, I'm Ufuk's AI Assistant 👋</h2><p>I can answer questions about Ufuk Yılmaz's professional background, skills, projects, and experience. Ask me in English or Turkish!</p><div class="welcome-chips"><div class="welcome-chip" onclick="sendSuggestion('What is Ufuk\\'s professional background?')"><span class="chip-icon">💼</span> Professional background</div><div class="welcome-chip" onclick="sendSuggestion('What projects has Ufuk worked on?')"><span class="chip-icon">🚀</span> Projects & achievements</div><div class="welcome-chip" onclick="sendSuggestion('What are Ufuk\\'s technical skills?')"><span class="chip-icon">⚡</span> Technical skills</div><div class="welcome-chip" onclick="sendSuggestion('Ufuk\\'un eğitim geçmişi nedir?')"><span class="chip-icon">🎓</span> Eğitim geçmişi</div></div></div>`;
+  document.getElementById('modeIndicator').innerHTML='✨ RAG-powered · Retrieval-Augmented Generation';
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-document.getElementById('chatInput').addEventListener('input',()=>{document.getElementById('sendBtn').disabled=!document.getElementById('chatInput').value.trim()})
+  document.getElementById('chatInput').addEventListener('input',()=>{document.getElementById('sendBtn').disabled=!document.getElementById('chatInput').value.trim()});
 });
 </script>
 </body>
